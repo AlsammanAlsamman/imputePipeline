@@ -13,6 +13,7 @@ dataset:
   input_plink: "/s/nath-lab/alsamman/__Data__/MEX123_Imputation/raw/MEX123"  # Without .bed/.bim/.fam extension
   impute_server: "michigan"  # or "topmed"
   imputation_results_links: "results/imputation_results_links.txt"
+  pass_file: "results/pass.txt"
 
  
 # Output directories
@@ -38,7 +39,7 @@ qc_filters:
     
   # Post-imputation filters  
   post_imputation:
-    info_score: 0.8   # Imputation INFO/R2 score (0.8)
+    info_score: 0.7   # Imputation INFO/R2 score (0.7)
     maf: 0.01         # Minor allele frequency (1%)
     missing_rate: 0.05 # Missing rate after imputation (5%)
 

@@ -14,3 +14,15 @@
 
 # Download imputed results from server
 ./submit.sh --snakefile rules/download_imputed.smk results/05_imputed_data/MEX123_download_imputed.done
+
+# Extract password-protected imputed files (parallel by chromosome)
+./submit.sh --snakefile rules/extract_imputed.smk --jobs 22 --cores 22 results/06_extracted_data/MEX123_extract_imputed.done
+
+# Filter imputed data from Michigan server (parallel by chromosome)
+./submit.sh --snakefile rules/filter_imputed_michigan.smk --jobs 22 results/07_filtered/michigan_filtering_complete.done
+
+# Prepare VCF files for PLINK conversion (parallel by chromosome)
+./submit.sh --snakefile rules/prepare_vcf_for_plink.smk --jobs 22 results/08_plink_ready/vcf_preparation_complete.done
+
+# for one chromosome
+snakemake --snakefile rules/filter_imputed_michigan.smk results/07_filtered/chr1.filtered.vcf.gz -j 1 --forcerun filter_imputed_michigan_chr

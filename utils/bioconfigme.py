@@ -200,6 +200,99 @@ def get_download_params() -> Dict[str, Any]:
     return params
 
 
+def get_extract_params() -> Dict[str, Any]:
+    """
+    Get extraction parameters from analysis config.
+    
+    Returns:
+        Dict[str, Any]: Extraction parameters including password file path
+    """
+    analysis_config = load_config("configs/analysis.yml")
+    
+    results_dir = get(analysis_config, 'results_dir', 'results')
+    
+    params = {
+        'dataset': get(analysis_config, 'dataset.name'),
+        'results_dir': results_dir,
+        'pass_file': get(analysis_config, 'dataset.pass_file'),
+        'extracted_dir': f"{results_dir}/06_extracted_data",  # Constructed from results_dir
+        'chromosomes': get(analysis_config, 'dataset.chromosomes', 22),
+    }
+    
+    return params
+
+
+def get_software_module(software_name: str) -> str:
+    """
+    Get the module name for a specific software tool.
+    
+    Args:
+        software_name (str): Name of the software (e.g., "bcftools", "plink", "plink2")
+        
+    Returns:
+        str: Module name to load (e.g., "bcftools/1.15")
+        
+    Raises:
+        KeyError: If software is not found in configuration
+        
+    Examples:
+        >>> get_software_module("bcftools")
+        'bcftools/1.15'
+        >>> get_software_module("plink")
+        'plink2/1.90b3w'
+    """
+    software_config = load_config("configs/software.yml")
+    module_name = get(software_config, f"{software_name}.module")
+    
+    if module_name is None:
+        raise KeyError(f"Software '{software_name}' not found in software configuration")
+    
+    return module_name
+
+
+def get_software_params(software_name: str) -> Dict[str, Any]:
+    """
+    Get the parameters for a specific software tool.
+    
+    Args:
+        software_name (str): Name of the software (e.g., "bcftools", "plink")
+        
+    Returns:
+        Dict[str, Any]: Dictionary with software parameters
+        
+    Examples:
+        >>> get_software_params("bcftools")
+        {'output_type': '-O z', 'threads': '--threads 2'}
+    """
+    software_config = load_config("configs/software.yml")
+    params = get(software_config, f"{software_name}.params", {})
+    return params
+
+
+def get_config_value(config_file: str, key_path: str, default: Any = None) -> Any:
+    """
+    Get a configuration value from a specific config file using dot notation.
+    
+    This is a convenience function that combines load_config and get.
+    
+    Args:
+        config_file (str): Path to the configuration file
+        key_path (str): Key path using dot notation (e.g., "dataset.name")
+        default (Any): Default value to return if key not found
+        
+    Returns:
+        Any: Value at the specified key path, or default if not found
+        
+    Examples:
+        >>> get_config_value("configs/analysis.yml", "dataset.name")
+        'MEX123'
+        >>> get_config_value("configs/software.yml", "bcftools.module")
+        'bcftools/1.15'
+    """
+    config = load_config(config_file)
+    return get(config, key_path, default)
+
+
 # TODO: Add these functions as the pipeline develops
 def merge_configs(*configs: Dict[str, Any]) -> Dict[str, Any]:
     """

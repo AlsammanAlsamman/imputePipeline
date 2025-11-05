@@ -18,7 +18,7 @@ plink2:
     threads: "--threads 2"
 
 bcftools:
-  module: "bcftools/1.15"
+  module: "bcftools"
   version: "1.15"
   params:
     output_type: "-O z"  # compressed VCF output
