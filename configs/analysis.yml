@@ -1,0 +1,98 @@
+# Project information
+project:
+  name: "imputation-pipeline"
+  version: "1.0.0"
+  description: "Genomic imputation pipeline for Michigan/TOPMed servers"
+
+# Dataset information
+dataset:
+  name: "MEX123"
+  sample_size: 1500
+  chromosomes: 22  # Number of autosomes to process
+  build: "hg19"    # or hg38
+  input_plink: "/s/nath-lab/alsamman/__Data__/MEX123_Imputation/raw/MEX123"  # Without .bed/.bim/.fam extension
+  impute_server: "michigan"  # or "topmed"
+  imputation_results_links: "results/imputation_results_links.txt"
+
+ 
+# Output directories
+results_dir: "results"
+logs_dir: "results/logs"
+temp_dir: "results/temp"
+
+
+# Input/Output paths
+harmonization:
+  # Reference files for harmonization
+  reference_fasta: "/s/nath-lab/alsamman/__Data__/MEX123_Imputation/ref_hg19/human_g1k_v37.fasta"
+  
+
+# Quality control thresholds
+qc_filters:
+  # Pre-imputation filters
+  pre_imputation:
+    mind: 0.05        # Sample missing rate (5%)
+    geno: 0.05        # SNP missing rate (5%)
+    maf: 0.01         # Minor allele frequency (1%)
+    hwe: 1e-6         # Hardy-Weinberg equilibrium p-value
+    
+  # Post-imputation filters  
+  post_imputation:
+    info_score: 0.8   # Imputation INFO/R2 score (0.8)
+    maf: 0.01         # Minor allele frequency (1%)
+    missing_rate: 0.05 # Missing rate after imputation (5%)
+
+# Imputation server settings
+imputation:
+  servers:
+    - "michigan"      # Michigan Imputation Server
+    - "topmed"        # TOPMed Imputation Server
+  
+  # Default server parameters
+  michigan:
+    build: "hg19"
+    panel: "1000g-phase-3-v5"
+    population: "mixed"  # or specific population
+    phasing: "eagle"
+    mode: "imputation"
+    
+  topmed:
+    build: "hg38" 
+    panel: "topmed-r2"
+    population: "mixed"
+    phasing: "eagle" 
+    mode: "imputation"
+
+# Snakemake wildcards
+wildcards:
+  - "dataset"  # Dataset name
+  - "sample"    # Sample/dataset name
+  - "chr"       # Chromosome number (1-22)
+
+# Resource requirements per rule
+resources:
+  pre_qc:
+    mem_mb: 16000
+    cores: 2
+    time: "01:00:00"
+    
+  harmonize:
+    mem_mb: 24000  
+    cores: 2
+    time: "02:00:00"
+    
+  vcf_convert:
+    mem_mb: 32000
+    cores: 4
+    time: "02:00:00"
+    
+  post_imputation:
+    mem_mb: 24000
+    cores: 2  
+    time: "01:30:00"
+    
+  merge_final:
+    mem_mb: 64000
+    cores: 8
+    time: "04:00:00"
+

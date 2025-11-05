@@ -1,0 +1,66 @@
+# Software Configuration
+# Module names and parameters for imputation pipeline tools
+
+# Core bioinformatics tools
+plink:
+  module: "plink2/1.90b3w"
+  version: "1.90b3w"
+  params:
+    memory: "--memory 32000"
+    threads: "--threads 2"
+    allow_no_sex: "--allow-no-sex"
+
+plink2:
+  module: "plink2/2.00a3"
+  version: "2.00a3" 
+  params:
+    memory: "--memory 32000"
+    threads: "--threads 2"
+
+bcftools:
+  module: "bcftools/1.15"
+  version: "1.15"
+  params:
+    output_type: "-O z"  # compressed VCF output
+    threads: "--threads 2"
+
+tabix:
+  module: "htslib/1.15"
+  version: "1.15"
+
+bgzip:
+  module: "htslib/1.15" 
+  version: "1.15"
+  params:
+    threads: "--threads 2"
+
+# Quality control tools
+vcftools:
+  module: "vcftools/0.1.16"
+  version: "0.1.16"
+
+# Python environment
+python:
+  module: "python/3.9"
+  version: "3.9"
+  packages:
+    - "pyyaml"
+    - "pandas"
+    - "numpy"
+
+# R environment (if needed for QC plots)
+r:
+  module: "R/4.4.1-mkl"
+  version: "4.4.1"
+  packages:
+    - "ggplot2" 
+    - "data.table"
+
+# SLURM resource defaults
+slurm:
+  partition: "standard"
+  qos: "normal"
+  default_time: "02:00:00"
+  default_memory: "32G"
+  default_cpus: 2
+  email_type: "FAIL"
