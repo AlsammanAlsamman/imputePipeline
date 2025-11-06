@@ -10,9 +10,17 @@ plink:
     threads: "--threads 2"
     allow_no_sex: "--allow-no-sex"
 
+plink1:
+  module: "plink2/1.90b3w"  # PLINK1.9 for VCF conversion
+  version: "1.90b3w"
+  params:
+    memory: "--memory 32000"
+    threads: "--threads 2"
+    allow_no_sex: "--allow-no-sex"
+
 plink2:
-  module: "plink2/2.00a3"
-  version: "2.00a3" 
+  module: "plink2/2.00a3.3lm"  # PLINK2 for advanced operations
+  version: "2.00a3.3lm" 
   params:
     memory: "--memory 32000"
     threads: "--threads 2"

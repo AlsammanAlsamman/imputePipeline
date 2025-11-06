@@ -32,10 +32,11 @@ echo "Summary: $SUMMARY_FILE"
 echo "================================="
 echo ""
 
-# Step 1: Get input statistics
+# Step 1: Get input statistics (skip full count for large files)
 echo "Step 1: Analyzing input VCF..."
-INPUT_VARIANTS=$(bcftools view -H "$INPUT_VCF" | wc -l)
-echo "Input variants: $INPUT_VARIANTS"
+echo "Input file size: $(du -h "$INPUT_VCF" | cut -f1)"
+echo "Skipping full variant count (would be slow for large files)"
+INPUT_VARIANTS="unknown"
 
 # Step 2: Prepare VCF for PLINK by removing problematic variants
 echo "Step 2: Removing problematic variants for PLINK..."
@@ -69,7 +70,14 @@ fi
 # Step 4: Get output statistics
 echo "Step 4: Generating statistics..."
 OUTPUT_VARIANTS=$(bcftools view -H "$OUTPUT_VCF" | wc -l)
-REMOVED_VARIANTS=$((INPUT_VARIANTS - OUTPUT_VARIANTS))
+echo "Output variants: $OUTPUT_VARIANTS"
+
+# Calculate removed variants only if input was counted
+if [[ "$INPUT_VARIANTS" != "unknown" ]]; then
+    REMOVED_VARIANTS=$((INPUT_VARIANTS - OUTPUT_VARIANTS))
+else
+    REMOVED_VARIANTS="unknown"
+fi
 
 # Step 5: Create brief summary
 END_TIME=$(date +%s)
@@ -86,7 +94,7 @@ Processing time: ${DURATION} seconds
 Input variants: $INPUT_VARIANTS
 Output variants: $OUTPUT_VARIANTS
 Variants removed: $REMOVED_VARIANTS
-Retention rate: $(echo "scale=1; $OUTPUT_VARIANTS * 100 / $INPUT_VARIANTS" | bc)%
+$(if [[ "$INPUT_VARIANTS" != "unknown" ]]; then echo "Retention rate: $(echo "scale=1; $OUTPUT_VARIANTS * 100 / $INPUT_VARIANTS" | bc)%"; else echo "Retention rate: calculated from output count only"; fi)
 
 Operations performed:
 - Removed multi-allelic variants (kept biallelic only)
@@ -101,10 +109,15 @@ EOF
 
 echo ""
 echo "=== Brief Summary ==="
-echo "Input variants: $INPUT_VARIANTS"
+echo "Input file size: $(du -h "$INPUT_VCF" | cut -f1)"
 echo "Output variants: $OUTPUT_VARIANTS"
-echo "Removed: $REMOVED_VARIANTS variants"
-echo "Retention: $(echo "scale=1; $OUTPUT_VARIANTS * 100 / $INPUT_VARIANTS" | bc)%"
+if [[ "$REMOVED_VARIANTS" != "unknown" ]]; then
+    echo "Removed: $REMOVED_VARIANTS variants"
+    echo "Retention: $(echo "scale=1; $OUTPUT_VARIANTS * 100 / $INPUT_VARIANTS" | bc)%"
+else
+    echo "Removed: estimated (large file, counting skipped)"
+    echo "Retention: check output vs input file sizes"
+fi
 echo "Processing time: ${DURATION} seconds"
 echo "===================="
 echo ""

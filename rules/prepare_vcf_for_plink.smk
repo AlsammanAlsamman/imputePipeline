@@ -135,15 +135,18 @@ rule prepare_vcf_for_plink_all:
         echo "Summary Statistics:" >> {output.done_marker}
         TOTAL_INPUT=0
         TOTAL_OUTPUT=0
+        UNKNOWN_INPUT=0
         
         for chr in {{1..{params.n_chr}}}; do
             if [[ -f {PLINK_READY_DIR}/chr${{chr}}.prep_summary.txt ]]; then
                 # Extract key numbers from individual summaries
-                INPUT_VAR=$(grep "Input variants:" {PLINK_READY_DIR}/chr${{chr}}.prep_summary.txt | awk '{{print $NF}}' || echo "0")
+                INPUT_VAR=$(grep "Input variants:" {PLINK_READY_DIR}/chr${{chr}}.prep_summary.txt | awk '{{print $NF}}' || echo "unknown")
                 OUTPUT_VAR=$(grep "Output variants:" {PLINK_READY_DIR}/chr${{chr}}.prep_summary.txt | awk '{{print $NF}}' || echo "0")
                 
                 if [[ "$INPUT_VAR" =~ ^[0-9]+$ ]]; then
                     TOTAL_INPUT=$((TOTAL_INPUT + INPUT_VAR))
+                else
+                    UNKNOWN_INPUT=$((UNKNOWN_INPUT + 1))
                 fi
                 if [[ "$OUTPUT_VAR" =~ ^[0-9]+$ ]]; then
                     TOTAL_OUTPUT=$((TOTAL_OUTPUT + OUTPUT_VAR))
@@ -151,11 +154,17 @@ rule prepare_vcf_for_plink_all:
             fi
         done
         
-        echo "Total input variants: $TOTAL_INPUT" >> {output.done_marker}
-        echo "Total output variants: $TOTAL_OUTPUT" >> {output.done_marker}
-        echo "Total variants removed: $((TOTAL_INPUT - TOTAL_OUTPUT))" >> {output.done_marker}
-        if [[ $TOTAL_INPUT -gt 0 ]]; then
-            echo "Retention rate: $(echo "scale=1; $TOTAL_OUTPUT * 100 / $TOTAL_INPUT" | bc)%" >> {output.done_marker}
+        if [[ $UNKNOWN_INPUT -gt 0 ]]; then
+            echo "Total input variants: not counted (large files)" >> {output.done_marker}
+            echo "Total output variants: $TOTAL_OUTPUT" >> {output.done_marker}
+            echo "Note: Input counting skipped for $UNKNOWN_INPUT chromosomes (performance optimization)" >> {output.done_marker}
+        else
+            echo "Total input variants: $TOTAL_INPUT" >> {output.done_marker}
+            echo "Total output variants: $TOTAL_OUTPUT" >> {output.done_marker}
+            echo "Total variants removed: $((TOTAL_INPUT - TOTAL_OUTPUT))" >> {output.done_marker}
+            if [[ $TOTAL_INPUT -gt 0 ]]; then
+                echo "Retention rate: $(echo "scale=1; $TOTAL_OUTPUT * 100 / $TOTAL_INPUT" | bc)%" >> {output.done_marker}
+            fi
         fi
         echo "" >> {output.done_marker}
         echo "Output directory: {PLINK_READY_DIR}" >> {output.done_marker}
