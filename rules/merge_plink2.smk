@@ -1,13 +1,12 @@
 import os
 
 from snakemake.io import expand
-os.sys.path.append("utils")
-from bioconfigme import get_plink_merge_params
-# get the software module
-from bioconfigme import get_software_module
+
+from utils.bioconfigme import get_plink_merge_params
+from utils.bioconfigme import get_software_module
 
 cfg = get_plink_merge_params()
-plinkmodule= get_software_module("plink2")
+plinkmodule = get_software_module("plink2")
 
 DATASET = cfg["dataset"]
 CHROMOSOMES = cfg["chromosomes"]
@@ -15,7 +14,6 @@ INPUT_DIR = cfg["input_dir"]
 OUTPUT_DIR = cfg["output_dir"]
 LOG_DIR = cfg["log_dir"]
 PLINK2_MODULE = plinkmodule
-print(PLINK2_MODULE)
 
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)

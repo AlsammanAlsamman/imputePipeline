@@ -52,6 +52,10 @@ inputs/              # Input data directory
 4. **Post-Imputation**: Quality filtering of imputed data
 5. **Merge Final**: Chromosome merging and final QC
 
+## Roadmap
+
+- Integrate automated TOPMed imputation submission and retrieval workflows.
+
 ## Requirements
 
 - SLURM cluster environment

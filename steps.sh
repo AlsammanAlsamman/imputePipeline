@@ -30,9 +30,5 @@
 # Merge chromosome PLINK binaries into a single dataset
 ./submit.sh --snakefile rules/merge_plink2.smk results/10_plink_merged/MEX123_merged.done
 
-# for all 
-
-
-
-# # for one chromosome
-# snakemake --snakefile rules/filter_imputed_michigan.smk results/07_filtered/chr1.filtered.vcf.gz -j 1 --forcerun filter_imputed_michigan_chr
+# Convert merged PLINK2 dataset into PLINK1 binary format
+./submit.sh --snakefile rules/convert_plink2_to_bed.smk results/10_plink_merged/MEX123_bed.done
