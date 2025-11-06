@@ -25,7 +25,14 @@
 ./submit.sh --snakefile rules/prepare_vcf_for_plink.smk --jobs 22 results/08_plink_ready/vcf_preparation_complete.done
 
 # Convert VCF to PLINK1 binary format (parallel by chromosome)
-./submit.sh --snakefile rules/convert_to_plink.smk --jobs 22 results/09_plink_format/plink_conversion_complete.done
+./submit.sh --snakefile rules/convert_to_plink_all.smk --jobs 22 results/09_plink_format/plink_conversion_complete.done
 
-# for one chromosome
-snakemake --snakefile rules/filter_imputed_michigan.smk results/07_filtered/chr1.filtered.vcf.gz -j 1 --forcerun filter_imputed_michigan_chr
+# Merge chromosome PLINK binaries into a single dataset
+./submit.sh --snakefile rules/merge_plink2.smk results/10_plink_merged/MEX123_merged.done
+
+# for all 
+
+
+
+# # for one chromosome
+# snakemake --snakefile rules/filter_imputed_michigan.smk results/07_filtered/chr1.filtered.vcf.gz -j 1 --forcerun filter_imputed_michigan_chr

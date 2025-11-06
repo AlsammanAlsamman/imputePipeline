@@ -222,6 +222,124 @@ def get_extract_params() -> Dict[str, Any]:
     return params
 
 
+def _require_config_value(name: str, value: Any) -> Any:
+    """Ensure a config value exists, raising a clear error otherwise."""
+    if value in (None, ""):
+        raise KeyError(f"Required configuration value '{name}' is missing")
+    return value
+
+
+def get_plink_conversion_params() -> Dict[str, Any]:
+    """Collect PLINK conversion settings with validation."""
+    analysis_config = load_config("configs/analysis.yml")
+    software_config = load_config("configs/software.yml")
+
+    dataset = _require_config_value(
+        "dataset.name",
+        get(analysis_config, "dataset.name"),
+    )
+
+    results_dir = _require_config_value(
+        "results_dir",
+        get(analysis_config, "results_dir"),
+    )
+
+    plink_ready_dir = f"{results_dir}/08_plink_ready"
+    plink_format_dir = f"{results_dir}/09_plink_format"
+    log_dir = f"{results_dir}/log"
+
+    raw_chromosomes = _require_config_value(
+        "dataset.chromosomes",
+        get(analysis_config, "dataset.chromosomes"),
+    )
+
+    if isinstance(raw_chromosomes, int):
+        chromosomes = [str(c) for c in range(1, raw_chromosomes + 1)]
+    elif isinstance(raw_chromosomes, (list, tuple)):
+        chromosomes = [str(c) for c in raw_chromosomes]
+    else:
+        raise ValueError("dataset.chromosomes must be integer or list")
+
+    info_score = _require_config_value(
+        "qc_filters.post_imputation.info_score",
+        get(analysis_config, "qc_filters.post_imputation.info_score"),
+    )
+
+    maf = _require_config_value(
+        "qc_filters.post_imputation.maf",
+        get(analysis_config, "qc_filters.post_imputation.maf"),
+    )
+
+    missing_rate = _require_config_value(
+        "qc_filters.post_imputation.missing_rate",
+        get(analysis_config, "qc_filters.post_imputation.missing_rate"),
+    )
+
+    plink1_module = _require_config_value(
+        "software.plink1.module",
+        get(software_config, "plink1.module"),
+    )
+
+    return {
+        "dataset": dataset,
+        "chromosomes": chromosomes,
+        "results_dir": results_dir,
+        "input_dir": plink_ready_dir,
+        "output_dir": plink_format_dir,
+        "log_dir": log_dir,
+        "info_score": info_score,
+        "maf": maf,
+        "missing_rate": missing_rate,
+        "plink1_module": plink1_module,
+    }
+
+
+def get_plink_merge_params() -> Dict[str, Any]:
+    """Get parameters required for merging per-chromosome PLINK datasets."""
+    analysis_config = load_config("configs/analysis.yml")
+    software_config = load_config("configs/software.yml")
+
+    dataset = _require_config_value(
+        "dataset.name",
+        get(analysis_config, "dataset.name"),
+    )
+
+    results_dir = _require_config_value(
+        "results_dir",
+        get(analysis_config, "results_dir"),
+    )
+
+    raw_chromosomes = _require_config_value(
+        "dataset.chromosomes",
+        get(analysis_config, "dataset.chromosomes"),
+    )
+
+    if isinstance(raw_chromosomes, int):
+        chromosomes = [str(c) for c in range(1, raw_chromosomes + 1)]
+    elif isinstance(raw_chromosomes, (list, tuple)):
+        chromosomes = [str(c) for c in raw_chromosomes]
+    else:
+        raise ValueError("dataset.chromosomes must be integer or list")
+
+    plink_module = _require_config_value(
+        "software.plink2.module",
+        get(software_config, "plink2.module"),
+    )
+
+    input_dir = f"{results_dir}/09_plink_format"
+    output_dir = f"{results_dir}/10_plink_merged"
+    log_dir = f"{results_dir}/log"
+
+    return {
+        "dataset": dataset,
+        "chromosomes": chromosomes,
+        "input_dir": input_dir,
+        "output_dir": output_dir,
+        "log_dir": log_dir,
+        "plink_module": plink_module,
+    }
+
+
 def get_software_module(software_name: str) -> str:
     """
     Get the module name for a specific software tool.
