@@ -6,11 +6,11 @@ project:
 
 # Dataset information
 dataset:
-  name: "MEX123"
+  name: "MEX"
   sample_size: 1500
   chromosomes: 22  # Number of autosomes to process
   build: "hg19"    # or hg38
-  input_plink: "/s/nath-lab/alsamman/__Data__/MEX123_Imputation/raw/MEX123"  # Without .bed/.bim/.fam extension
+  input_plink: "/s/nath-lab/alsamman/__Data__/RAW_Data/MEX"  # Without .bed/.bim/.fam extension
   impute_server: "michigan"  # or "topmed"
   imputation_results_links: "results/imputation_results_links.txt"
   pass_file: "results/pass.txt"
