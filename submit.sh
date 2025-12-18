@@ -136,6 +136,7 @@ else
         --latency-wait 120 \
         --keep-going \
         --rerun-incomplete \
+        --keep-incomplete \
         --configfile config/pipeline_config.yaml \
         --snakefile "$DEFAULT_SNAKEFILE" \
         --cores $DEFAULT_CORES \
