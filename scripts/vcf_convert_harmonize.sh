@@ -57,6 +57,7 @@ for CHR in {1..22}; do
           --recode vcf \
           --out "${OUT_DIR}/${DATASET}_chr${CHR}_temp" \
           --memory 32000 \
+          --snps-only \
           --threads 4 \
           --allow-no-sex
     
