@@ -114,6 +114,7 @@ if [[ "$INDIVIDUAL_RULE" == true ]]; then
         --latency-wait 60 \
         --keep-going \
         --rerun-incomplete \
+        --keep-incomplete \
         --snakefile "$DEFAULT_SNAKEFILE" \
         --cores $DEFAULT_CORES \
         --verbose \
